@@ -18,7 +18,7 @@ import java.util.Objects;
 
 import java.io.IOException;
 
-public class Treis {
+public class Oito {
 
     public static void main(String[] args) throws Exception {
         BasicConfigurator.configure();
@@ -83,7 +83,7 @@ public class Treis {
         public void reduce(EightWritable key, FloatWritable values, Context con)
                 throws IOException, InterruptedException {
 
-            
+
 
             con.write(new Text(key.toString()), valorSaida);
         }
