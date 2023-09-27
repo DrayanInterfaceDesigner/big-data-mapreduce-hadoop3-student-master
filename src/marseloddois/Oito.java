@@ -2,9 +2,7 @@ package marseloddois;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -13,8 +11,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.log4j.BasicConfigurator;
 
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.time.Year;
@@ -47,7 +43,7 @@ public class Treis {
 
         // definicao dos tipos de saida
         j.setMapOutputKeyClass(EightWritable.class);
-        j.setMapOutputValueClass(IntWritable.class);
+        j.setMapOutputValueClass(FloatWritable.class);
         j.setOutputKeyClass(Text.class);
         j.setOutputValueClass(IntWritable.class);
 
@@ -60,7 +56,7 @@ public class Treis {
     }
 
 
-    public static class Map extends Mapper<LongWritable, Text, EightWritable, IntWritable> {
+    public static class Map extends Mapper<LongWritable, Text, EightWritable, FloatWritable> {
 
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
@@ -76,23 +72,18 @@ public class Treis {
 
                 // Descrição e valor da commodity com o maior preço por tipo de unidade (unit) e ano.
 
-                con.write(new EightWritable(year, quantity_name), new IntWritable(1));
+                con.write(new EightWritable(year, commodity, quantity_name), new FloatWritable(trade_usd));
 
             }
         }
     }
 
-    public static class Reduce extends Reducer<YearFlowWritable, IntWritable, Text, IntWritable> {
+    public static class Reduce extends Reducer<EightWritable, FloatWritable, Text, IntWritable> {
 
-        public void reduce(YearFlowWritable key, Iterable<IntWritable> values, Context con)
+        public void reduce(EightWritable key, FloatWritable values, Context con)
                 throws IOException, InterruptedException {
 
-            int soma = 0;
-            for (IntWritable v : values) {
-                soma += v.get();
-            }
-
-            IntWritable valorSaida = new IntWritable(soma);
+            
 
             con.write(new Text(key.toString()), valorSaida);
         }
@@ -100,14 +91,16 @@ public class Treis {
 
     public static class EightWritable implements WritableComparable<EightWritable> {
         private String year;
+        private String commodity;
         private String quantity_name;
 
         public EightWritable() {
 
         }
 
-        public EightWritable(String year, String quantity_name) {
+        public EightWritable(String year, String commodity, String quantity_name) {
             this.year = year;
+            this.commodity = commodity;
             this.quantity_name = quantity_name;
         }
 
@@ -117,6 +110,14 @@ public class Treis {
 
         public void setYear(String year) {
             this.year = year;
+        }
+
+        public String getCommodity() {
+            return commodity;
+        }
+
+        public void setCommodity(String commodity) {
+            this.commodity = commodity;
         }
 
         public String getQuantity_name() {
@@ -132,29 +133,31 @@ public class Treis {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             EightWritable that = (EightWritable) o;
-            return Objects.equals(that.year, year) && Objects.equals(quantity_name, that.quantity_name);
+            return Objects.equals(that.year, year) && Objects.equals(quantity_name, that.quantity_name) && Objects.equals(commodity, that.commodity);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(year, quantity_name);
+            return Objects.hash(year, commodity, quantity_name);
         }
 
         @Override
         public void write(DataOutput dataOutput) throws IOException {
             dataOutput.writeUTF(year);
+            dataOutput.writeUTF(commodity);
             dataOutput.writeUTF(quantity_name);
         }
 
         @Override
         public void readFields(DataInput dataInput) throws IOException {
             year = dataInput.readUTF();
+            commodity = dataInput.readUTF();
             quantity_name = dataInput.readUTF();
         }
 
         @Override
         public String toString() {
-            return year +", " + quantity_name ;
+            return commodity + ", " + year + ", " + quantity_name ;
         }
 
         @Override
