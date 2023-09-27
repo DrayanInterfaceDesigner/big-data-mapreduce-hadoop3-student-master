@@ -56,6 +56,7 @@ public class Teste {
         // Funcao de map
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
+
             con.write(new Text("Big Data"), new Text(" eh legal"));
         }
     }

@@ -58,7 +58,20 @@ public class MarseloCompany {
         // Funcao de map
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
-            String[] fields = value.toString().split(";");
+            //
+            String[] cols = value.toString().split(";");
+
+            float country_or_area = Float.parseFloat(cols[0]);
+            float year = Float.parseFloat(cols[1]);
+            float comm_code = Float.parseFloat(cols[2]);
+            float commodity = Float.parseFloat(cols[3]);
+            float flow = Float.parseFloat(cols[4]);
+            float trade_usd = Float.parseFloat(cols[5]);
+            float weight_kg = Float.parseFloat(cols[6]);
+            float quantity_name = Float.parseFloat(cols[7]);
+            float quantity = Float.parseFloat(cols[8]);
+            float category = Float.parseFloat(cols[9]);
+
             con.write(new Text("Big Data"), new Text(" eh legal"));
         }
     }
