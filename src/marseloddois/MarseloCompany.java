@@ -61,16 +61,22 @@ public class MarseloCompany {
             //
             String[] cols = value.toString().split(";");
 
-            float country_or_area = Float.parseFloat(cols[0]);
-            float year = Float.parseFloat(cols[1]);
-            float comm_code = Float.parseFloat(cols[2]);
-            float commodity = Float.parseFloat(cols[3]);
-            float flow = Float.parseFloat(cols[4]);
-            float trade_usd = Float.parseFloat(cols[5]);
-            float weight_kg = Float.parseFloat(cols[6]);
-            float quantity_name = Float.parseFloat(cols[7]);
-            float quantity = Float.parseFloat(cols[8]);
-            float category = Float.parseFloat(cols[9]);
+            String country_or_area = cols[0];
+            Integer year = Integer.parseInt(cols[1]);
+            Integer comm_code = Integer.parseInt(cols[2]);
+
+            //exemplo: Animals, live, except farm animals
+            String commodity = cols[3];
+
+            String flow = cols[4];
+            Float trade_usd = Float.parseFloat(cols[5]);
+            Float weight_kg = Float.parseFloat(cols[6]);
+            String quantity_name = cols[7];
+            Float quantity = Float.parseFloat(cols[8]);
+            String category = cols[9];
+
+            //exemplo: ["Animals", "live", "except farm animals"]
+            String[] commodity_parts = value.toString().split(",");
 
             con.write(new Text("Big Data"), new Text(" eh legal"));
         }
