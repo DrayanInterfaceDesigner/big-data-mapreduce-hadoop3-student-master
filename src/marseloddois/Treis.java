@@ -62,7 +62,6 @@ public class Treis {
 
     public static class Map extends Mapper<LongWritable, Text, YearFlowWritable, IntWritable> {
 
-        // Funcao de map
         public void map(LongWritable key, Text value, Context con)
                 throws IOException, InterruptedException {
             //
@@ -81,17 +80,16 @@ public class Treis {
 
     public static class Reduce extends Reducer<YearFlowWritable, IntWritable, Text, IntWritable> {
 
-        // Funcao de reduce
         public void reduce(YearFlowWritable key, Iterable<IntWritable> values, Context con)
                 throws IOException, InterruptedException {
 
             int soma = 0;
-            for (IntWritable v:values) {
-                soma+= v.get();
+            for (IntWritable v : values) {
+                soma += v.get();
             }
-            // cast da variável soma (int) para IntWritable
+
             IntWritable valorSaida = new IntWritable(soma);
-            // salva os resultados no HDFS utilizando o Context
+
             con.write(new Text(key.toString()), valorSaida);
         }
     }
