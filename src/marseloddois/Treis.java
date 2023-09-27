@@ -46,8 +46,8 @@ public class Treis {
         j.setReducerClass(Reduce.class);
 
         // definicao dos tipos de saida
-        j.setMapOutputKeyClass(Text.class);
-        j.setMapOutputValueClass(Text.class);
+        j.setMapOutputKeyClass(YearFlowWritable.class);
+        j.setMapOutputValueClass(IntWritable.class);
         j.setOutputKeyClass(Text.class);
         j.setOutputValueClass(IntWritable.class);
 
@@ -68,10 +68,14 @@ public class Treis {
             //
             String[] cols = value.toString().split(";");
 
-            Integer year = Integer.parseInt(cols[1]);
-            String flow = cols[4];
+            if(!cols[0].equalsIgnoreCase("country_or_area")) {
 
-            con.write(new YearFlowWritable(year, flow), new IntWritable(1));
+                String year = cols[1];
+                String flow = cols[4];
+
+                con.write(new YearFlowWritable(year, flow), new IntWritable(1));
+
+            }
         }
     }
 
@@ -94,18 +98,18 @@ public class Treis {
 
     public static class YearFlowWritable implements WritableComparable<YearFlowWritable>
     {
-        private int year;
+        private String year;
         private String flow;
         public YearFlowWritable() {
         }
-        public YearFlowWritable(int year, String flow) {
+        public YearFlowWritable(String year, String flow) {
             this.year = year;
             this.flow = flow;
         }
-        public int getYear() {
+        public String getYear() {
             return year;
         }
-        public void setYear(int year) {
+        public void setYear(String year) {
             this.year = year;
         }
         public String getFlow() {
@@ -119,7 +123,7 @@ public class Treis {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             YearFlowWritable that = (YearFlowWritable) o;
-            return that.year == year && Objects.equals(flow, that.flow);
+            return Objects.equals(that.year, year) && Objects.equals(flow, that.flow);
         }
         @Override
         public int hashCode() {
@@ -127,20 +131,18 @@ public class Treis {
         }
         @Override
         public void write(DataOutput dataOutput) throws IOException {
-            dataOutput.writeInt(year);
+            dataOutput.writeUTF(year);
             dataOutput.writeUTF(flow);
         }
         @Override
         public void readFields(DataInput dataInput) throws IOException {
-            year = dataInput.readInt();
+            year = dataInput.readUTF();
             flow = dataInput.readUTF();
         }
         @Override
         public String toString() {
-            return "YearFlowWritable{" +
-                    "year='" + year + '\'' +
-                    ", flow=" + flow +
-                    '}';
+            return year +
+                    ", " + flow ;
         }
         @Override
         public int compareTo(YearFlowWritable o) {
